@@ -10,7 +10,10 @@ white_list = ["qq.com", "baidu.com", "sina.com", "google.com", "4399.com", "youk
               "tianya.cn", "paipai.com", "microsoft.com", "pptv.com", "kugou.com", "joy.cn", "96pk.com", "10086.cn", "pomoho.com", "youdao.com",
               "58.com", "xinhuanet.com", "letv.com", "mop.com", "m18.com", "douban.com", "zhihu.com", "sdo.com", "alibaba.com",
               "funshion.com", "vancl.com", "126.com", "wushen.com", "6.cn", "soufun.com", "jiayuan.com", "china.com", "csdn.com",
-              "bilibili.com", "kugou.com", "jd.com", "jingdong.com", "meituan.com", "dnion.com"]
+              "bilibili.com", "kugou.com", "jd.com", "jingdong.com", "meituan.com", "dnion.com", "version.bind", "activum.nu", "VERSION.BIND"]
+
+path = '/mnt/myusbmount/Trojan_Monitor/dns_flow/'
+# path = '/home/csober/Documents/Github/ggs-ddu/GP/trojan_monitor/dns_monitor/wrong_test/'
 
 
 class dns_stream:
@@ -35,6 +38,7 @@ def stream2vector(dir):
     domain_list = []
     subdomain_num = {'subdomain_num': int(0)}
     topdomain_list = []
+    transaction_id_list = []
     for buf in dpkt:
         cnt += 1
         srcip = buf[IP].src
@@ -51,14 +55,21 @@ def stream2vector(dir):
         real_length = len(buf[IP]) - 20 - 8  #
         new_domain = 0
         subcnt = 0
+        topdomain = ''
         # try to catch DNS part.
+        try:
+            tmp = buf[IP]
+            tmp = buf[DNS]
+        except Exception, e:
+            print e.message
+            continue
+
         try:
             if cor_length != real_length and buf[IP].len > 46:  # in case padding some bytes.
                 #print srcport, " ", dstport
                 #print "length"
                 malformed = 1
             elif buf[DNS].qdcount > 2 or buf[DNS].ancount > 50 or buf[DNS].nscount > 20 or buf[DNS].arcount > 20:
-                print "#######"
                 malformed = 1
 #            elif buf[DNS].rcode > 5:
 #                malformed = 1
@@ -87,7 +98,10 @@ def stream2vector(dir):
                 if topdomain in white_list:
                     upload = 0
                     subdomain_num[topdomain] = 0
-
+                elif domain in ['activum.nu', 'version.bind', 'VERSION.BIND']:
+                    if upload < 90:
+                        upload = 0
+                        subdomain_num[topdomain] = 0
                 else:
                     if topdomain in topdomain_list:
                         if domain not in domain_list:
@@ -103,9 +117,14 @@ def stream2vector(dir):
             subcnt = subdomain_num[topdomain]
             stream.packet_list.append((timer, use_port, upload, malformed, dir, buf, srcip, dstip, new_domain, subcnt))
         except Exception, e:
+ #           try:
+ #               data = buf[DNS]
+ #           except Exception, e:
+ #               print e.message
+ #               print "packet ", cnt
+ #               continue
             print e.message
             print "packet ", cnt
-
             stream.packet_list.append((timer, use_port, upload, 1, dir, buf, srcip, dstip, 0, 0))
             continue
     return stream
@@ -146,8 +165,12 @@ def detect_dns(stream):
         upspeed = float(0.0)
         downspeed = float(0.0)
         malformed_num = 0
-        ip_1 = flow[0][6]
-        ip_2 = flow[0][7]
+        try:
+            ip_1 = flow[0][6]
+            ip_2 = flow[0][7]
+        except Exception, e:
+            print e.message
+            continue
         if ip_1 < ip_2:
             ip_1, ip_2 = swap(ip_1, ip_2)
         name = ip_1 + "-" + ip_2 + ":" + str(flow[0][1])
@@ -177,11 +200,11 @@ def detect_dns(stream):
         danger = bool(0)
 #        print upspeed, " ", len(flow), " ", domain_num
         print upspeed, " ", len(flow), " ", subdomain_warn
-        if (upspeed > 200) and (len(flow) > 10):
+        if (upspeed > 200) and (len(flow) > 10) and (pkt[9] > 5):
             danger = 1
-        if (upspeed > 300) and (len(flow) > 5):
+        if (upspeed > 300) and (len(flow) > 5) and (pkt[9] > 3):
             danger = 1
-        if malformed_num > 1:
+        if malformed_num > 3:
             danger = 2
         if subdomain_warn:
             danger = 3
@@ -206,7 +229,6 @@ if __name__ == "__main__":
     starttime = datetime.datetime.now()
     filelist = []
     multistream = []
-    path = 'udp_flow/'
     #path = "wrong_test/"
     #path = "/mnt/myusbmount/Trojan_Monitor/beijing/dns/speed/"
     filelist = os.listdir(path)

@@ -25,54 +25,65 @@ def swap(a, b):
 
 
 def ipv4_port(dir):
-    dpkt = rdpcap(dir)  # sniff(offline=dir, count=0)
+    # dpkt = rdpcap(dir)  # sniff(offline=dir, count=0)
     # print "rdpcap"
     cnt = 0
-    for buf in dpkt:
-        cnt += 1
-        try:
-            if buf[Ether].type != 0x800:
-                continue
-        except Exception, e:
-            print cnt
-            print e.message
-            continue
-        try:
-            if buf[IP].proto != 6:
-                continue
-        except Exception, e:
-            print cnt
-            print e.message
-            continue
-        dstport = 0
-        srcport = 0
-        try:
-            dstport = buf[TCP].dport
-            srcport = buf[TCP].sport
-        except Exception, e:
-            print cnt
-            print e.message
-            continue
+    try:
+        s1 = PcapReader(dir)
+        count = -1
+        while count != 0:
+            buf = s1.read_packet()
+            if buf is None:
+                break
+            else:
+                cnt += 1
+                try:
+                    if buf[Ether].type != 0x800:
+                        continue
+                except Exception, e:
+                    print cnt
+                    print e.message
+                    continue
+                try:
+                    if buf[IP].proto != 6:
+                        continue
+                except Exception, e:
+                    print cnt
+                    print e.message
+                    continue
+                try:
+                    dstport = buf[TCP].dport
+                    srcport = buf[TCP].sport
+                except Exception, e:
+                    print cnt
+                    print e.message
+                    continue
 
-        # judge the direction
-        ip_server = buf[IP].src + ":" + str(srcport)
-        ip_client = buf[IP].dst + ":" + str(dstport)
+                # judge the direction
+                if buf[IP].src < buf[IP].dst:
+                    ip_server = buf[IP].src + ":" + str(srcport)
+                    ip_client = buf[IP].dst + ":" + str(dstport)
+                else:
+                    ip_server = buf[IP].dst + ":" + str(dstport)
+                    ip_client = buf[IP].src + ":" + str(srcport)
 
-        name = ip_server + "-" + ip_client
+                name = ip_server + "-" + ip_client
 
-        # print name
-        if name in ip_flow_list:
-            a = ip_flow_list[name]
-            a.num = a.num + 1
-            a.list.append(buf)
-            ip_flow_list[name] = a
-        else:
-            newflow = ipflow()
-            newflow.name = name
-            newflow.num = 1
-            newflow.list.append(buf)
-            ip_flow_list[name] = newflow
-
+                # print name
+                if name in ip_flow_list:
+                    a = ip_flow_list[name]
+                    a.num = a.num + 1
+                    a.list.append(buf)
+                    ip_flow_list[name] = a
+                else:
+                    newflow = ipflow()
+                    newflow.name = name
+                    newflow.num = 1
+                    newflow.list.append(buf)
+                    ip_flow_list[name] = newflow
+        s1.close()
+    except Scapy_Exception as e:
+        print(e)
     for item in ip_flow_list:
         print ip_flow_list[item].name
         name = "ip_flow/" + ip_flow_list[item].name + '.pcap'
@@ -108,6 +119,6 @@ def ipv4(dir):
 
 
 if __name__ == '__main__':
-    ipv4_port("/mnt/myusbmount/DNS_MONITOR/packet/packets01/pure_dns.pcap")
+    ipv4_port("/mnt/myusbmount/Trojan_Monitor/beijing/background/colasoft_packets0118_2.cap")
     #ipv4_dns("/mnt/myusbmount/Trojan_Monitor/beijing/dns/4000300027.pcap.cap")
     #ipv4("/mnt/myusbmount/DNS_MONITOR/packet/beijing_packet/beijing_packet/dns/4000300027.pcap.cap")
