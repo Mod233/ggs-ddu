@@ -1,9 +1,0 @@
-client_hello_len, client_hello_version,client_hello_session_id_len,client_hello_cip_len,client_hello_compression_len,client_hello_extension_len,\
-server_hello_len, server_hello_session_id_len, server_hello_comp,server_hello_ext_len,\
-certification_len, certification_num,\
-server_key_exchange_len, server_key_exchange_curve_type, server_key_exchange_named_curve, server_key_exchange_pubkey_len, server_key_exchange_sig_alg_hash, server_key_exchange_sig_alg_sig, server_key_exchange_sig_len,\
-server_hello_done_len,\
-client_key_exchange_len, client_key_exchange_pubkey_len
-1,0,34,23,2
-0,0,21,11,0
-3,11,2,11,1
