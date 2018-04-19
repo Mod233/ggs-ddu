@@ -1,0 +1,1150 @@
+Help on module socket:
+
+NNAAMMEE
+    socket
+
+FFIILLEE
+    /usr/lib/python2.7/socket.py
+
+MMOODDUULLEE  DDOOCCSS
+    http://docs.python.org/library/socket
+
+DDEESSCCRRIIPPTTIIOONN
+    This module provides socket operations and some related functions.
+    On Unix, it supports IP (Internet Protocol) and Unix domain sockets.
+    On other systems, it only supports IP. Functions specific for a
+    socket are available as methods of the socket object.
+    
+    Functions:
+    
+    socket() -- create a new socket object
+    socketpair() -- create a pair of new socket objects [*]
+    fromfd() -- create a socket object from an open file descriptor [*]
+    gethostname() -- return the current hostname
+    gethostbyname() -- map a hostname to its IP number
+    gethostbyaddr() -- map an IP number or hostname to DNS info
+    getservbyname() -- map a service name and a protocol name to a port number
+    getprotobyname() -- map a protocol name (e.g. 'tcp') to a number
+    ntohs(), ntohl() -- convert 16, 32 bit int from network to host byte order
+    htons(), htonl() -- convert 16, 32 bit int from host to network byte order
+    inet_aton() -- convert IP addr string (123.45.67.89) to 32-bit packed format
+    inet_ntoa() -- convert 32-bit packed format IP to string (123.45.67.89)
+    ssl() -- secure socket layer support (only available if configured)
+    socket.getdefaulttimeout() -- get the default timeout value
+    socket.setdefaulttimeout() -- set the default timeout value
+    create_connection() -- connects to an address, with an optional timeout and
+                           optional source address.
+    
+     [*] not available on all platforms!
+    
+    Special objects:
+    
+    SocketType -- type object for socket objects
+    error -- exception raised for I/O errors
+    has_ipv6 -- boolean value indicating if IPv6 is supported
+    
+    Integer constants:
+    
+    AF_INET, AF_UNIX -- socket domains (first argument to socket() call)
+    SOCK_STREAM, SOCK_DGRAM, SOCK_RAW -- socket types (second argument)
+    
+    Many other constants may be defined; these may be used in calls to
+    the setsockopt() and getsockopt() methods.
+
+CCLLAASSSSEESS
+    __builtin__.object
+        _socketobject
+    exceptions.IOError(exceptions.EnvironmentError)
+        error
+            gaierror
+            herror
+            timeout
+    
+    SSoocckkeettTTyyppee = class _socketobject(__builtin__.object)
+     |  socket([family[, type[, proto]]]) -> socket object
+     |  
+     |  Open a socket of the given type.  The family argument specifies the
+     |  address family; it defaults to AF_INET.  The type argument specifies
+     |  whether this is a stream (SOCK_STREAM, this is the default)
+     |  or datagram (SOCK_DGRAM) socket.  The protocol argument defaults to 0,
+     |  specifying the default protocol.  Keyword arguments are accepted.
+     |  
+     |  A socket object represents one endpoint of a network connection.
+     |  
+     |  Methods of socket objects (keyword arguments not allowed):
+     |  
+     |  accept() -- accept a connection, returning new socket and client address
+     |  bind(addr) -- bind the socket to a local address
+     |  close() -- close the socket
+     |  connect(addr) -- connect the socket to a remote address
+     |  connect_ex(addr) -- connect, return an error code instead of an exception
+     |  dup() -- return a new socket object identical to the current one [*]
+     |  fileno() -- return underlying file descriptor
+     |  getpeername() -- return remote address [*]
+     |  getsockname() -- return local address
+     |  getsockopt(level, optname[, buflen]) -- get socket options
+     |  gettimeout() -- return timeout or None
+     |  listen(n) -- start listening for incoming connections
+     |  makefile([mode, [bufsize]]) -- return a file object for the socket [*]
+     |  recv(buflen[, flags]) -- receive data
+     |  recv_into(buffer[, nbytes[, flags]]) -- receive data (into a buffer)
+     |  recvfrom(buflen[, flags]) -- receive data and sender's address
+     |  recvfrom_into(buffer[, nbytes, [, flags])
+     |    -- receive data and sender's address (into a buffer)
+     |  sendall(data[, flags]) -- send all data
+     |  send(data[, flags]) -- send data, may not send all of it
+     |  sendto(data[, flags], addr) -- send data to a given address
+     |  setblocking(0 | 1) -- set or clear the blocking I/O flag
+     |  setsockopt(level, optname, value) -- set socket options
+     |  settimeout(None | float) -- set or clear the timeout
+     |  shutdown(how) -- shut down traffic in one or both directions
+     |  
+     |   [*] not available on all platforms!
+     |  
+     |  Methods defined here:
+     |  
+     |  ____iinniitt____(self, family=2, type=1, proto=0, _sock=None)
+     |  
+     |  aacccceepptt(self)
+     |      accept() -> (socket object, address info)
+     |      
+     |      Wait for an incoming connection.  Return a new socket representing the
+     |      connection, and the address of the client.  For IP sockets, the address
+     |      info is a pair (hostaddr, port).
+     |  
+     |  bbiinndd(...)
+     |      bind(address)
+     |      
+     |      Bind the socket to a local address.  For IP sockets, the address is a
+     |      pair (host, port); the host must refer to the local host. For raw packet
+     |      sockets the address is a tuple (ifname, proto [,pkttype [,hatype]])
+     |  
+     |  cclloossee(self, _closedsocket=<class 'socket._closedsocket'>, _delegate_methods=('recv', 'recvfrom', 'recv_into', 'recvfrom_into', 'send', 'sendto'), setattr=<built-in function setattr>)
+     |      close()
+     |      
+     |      Close the socket.  It cannot be used after this call.
+     |  
+     |  ccoonnnneecctt(...)
+     |      connect(address)
+     |      
+     |      Connect the socket to a remote address.  For IP sockets, the address
+     |      is a pair (host, port).
+     |  
+     |  ccoonnnneecctt__eexx(...)
+     |      connect_ex(address) -> errno
+     |      
+     |      This is like connect(address), but returns an error code (the errno value)
+     |      instead of raising an exception when an error occurs.
+     |  
+     |  dduupp(self)
+     |      dup() -> socket object
+     |      
+     |      Return a new socket object connected to the same system resource.
+     |  
+     |  ffiilleennoo(...)
+     |      fileno() -> integer
+     |      
+     |      Return the integer file descriptor of the socket.
+     |  
+     |  ggeettppeeeerrnnaammee(...)
+     |      getpeername() -> address info
+     |      
+     |      Return the address of the remote endpoint.  For IP sockets, the address
+     |      info is a pair (hostaddr, port).
+     |  
+     |  ggeettssoocckknnaammee(...)
+     |      getsockname() -> address info
+     |      
+     |      Return the address of the local endpoint.  For IP sockets, the address
+     |      info is a pair (hostaddr, port).
+     |  
+     |  ggeettssoocckkoopptt(...)
+     |      getsockopt(level, option[, buffersize]) -> value
+     |      
+     |      Get a socket option.  See the Unix manual for level and option.
+     |      If a nonzero buffersize argument is given, the return value is a
+     |      string of that length; otherwise it is an integer.
+     |  
+     |  ggeettttiimmeeoouutt(...)
+     |      gettimeout() -> timeout
+     |      
+     |      Returns the timeout in seconds (float) associated with socket 
+     |      operations. A timeout of None indicates that timeouts on socket 
+     |      operations are disabled.
+     |  
+     |  lliisstteenn(...)
+     |      listen(backlog)
+     |      
+     |      Enable a server to accept connections.  The backlog argument must be at
+     |      least 0 (if it is lower, it is set to 0); it specifies the number of
+     |      unaccepted connections that the system will allow before refusing new
+     |      connections.
+     |  
+     |  mmaakkeeffiillee(self, mode='r', bufsize=-1)
+     |      makefile([mode[, bufsize]]) -> file object
+     |      
+     |      Return a regular file object corresponding to the socket.  The mode
+     |      and bufsize arguments are as for the built-in open() function.
+     |  
+     |  sseennddaallll(...)
+     |      sendall(data[, flags])
+     |      
+     |      Send a data string to the socket.  For the optional flags
+     |      argument, see the Unix manual.  This calls send() repeatedly
+     |      until all data is sent.  If an error occurs, it's impossible
+     |      to tell how much data has been sent.
+     |  
+     |  sseettbblloocckkiinngg(...)
+     |      setblocking(flag)
+     |      
+     |      Set the socket to blocking (flag is true) or non-blocking (false).
+     |      setblocking(True) is equivalent to settimeout(None);
+     |      setblocking(False) is equivalent to settimeout(0.0).
+     |  
+     |  sseettssoocckkoopptt(...)
+     |      setsockopt(level, option, value)
+     |      
+     |      Set a socket option.  See the Unix manual for level and option.
+     |      The value argument can either be an integer or a string.
+     |  
+     |  sseettttiimmeeoouutt(...)
+     |      settimeout(timeout)
+     |      
+     |      Set a timeout on socket operations.  'timeout' can be a float,
+     |      giving in seconds, or None.  Setting a timeout of None disables
+     |      the timeout feature and is equivalent to setblocking(1).
+     |      Setting a timeout of zero is the same as setblocking(0).
+     |  
+     |  sshhuuttddoowwnn(...)
+     |      shutdown(flag)
+     |      
+     |      Shut down the reading side of the socket (flag == SHUT_RD), the writing side
+     |      of the socket (flag == SHUT_WR), or both ends (flag == SHUT_RDWR).
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  ____wweeaakkrreeff____
+     |      list of weak references to the object (if defined)
+     |  
+     |  ffaammiillyy
+     |      the socket family
+     |  
+     |  pprroottoo
+     |      the socket protocol
+     |  
+     |  rreeccvv
+     |  
+     |  rreeccvv__iinnttoo
+     |  
+     |  rreeccvvffrroomm
+     |  
+     |  rreeccvvffrroomm__iinnttoo
+     |  
+     |  sseenndd
+     |  
+     |  sseennddttoo
+     |  
+     |  ttyyppee
+     |      the socket type
+    
+    class eerrrroorr(exceptions.IOError)
+     |  Method resolution order:
+     |      error
+     |      exceptions.IOError
+     |      exceptions.EnvironmentError
+     |      exceptions.StandardError
+     |      exceptions.Exception
+     |      exceptions.BaseException
+     |      __builtin__.object
+     |  
+     |  Data descriptors defined here:
+     |  
+     |  ____wweeaakkrreeff____
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.IOError:
+     |  
+     |  ____iinniitt____(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from exceptions.IOError:
+     |  
+     |  ____nneeww____ = <built-in method __new__ of type object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.EnvironmentError:
+     |  
+     |  ____rreedduuccee____(...)
+     |  
+     |  ____ssttrr____(...)
+     |      x.__str__() <==> str(x)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.EnvironmentError:
+     |  
+     |  eerrrrnnoo
+     |      exception errno
+     |  
+     |  ffiilleennaammee
+     |      exception filename
+     |  
+     |  ssttrreerrrroorr
+     |      exception strerror
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.BaseException:
+     |  
+     |  ____ddeellaattttrr____(...)
+     |      x.__delattr__('name') <==> del x.name
+     |  
+     |  ____ggeettaattttrriibbuuttee____(...)
+     |      x.__getattribute__('name') <==> x.name
+     |  
+     |  ____ggeettiitteemm____(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  ____ggeettsslliiccee____(...)
+     |      x.__getslice__(i, j) <==> x[i:j]
+     |      
+     |      Use of negative indices is not supported.
+     |  
+     |  ____rreepprr____(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  ____sseettaattttrr____(...)
+     |      x.__setattr__('name', value) <==> x.name = value
+     |  
+     |  ____sseettssttaattee____(...)
+     |  
+     |  ____uunniiccooddee____(...)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.BaseException:
+     |  
+     |  ____ddiicctt____
+     |  
+     |  aarrggss
+     |  
+     |  mmeessssaaggee
+    
+    class ggaaiieerrrroorr(error)
+     |  Method resolution order:
+     |      gaierror
+     |      error
+     |      exceptions.IOError
+     |      exceptions.EnvironmentError
+     |      exceptions.StandardError
+     |      exceptions.Exception
+     |      exceptions.BaseException
+     |      __builtin__.object
+     |  
+     |  Data descriptors inherited from error:
+     |  
+     |  ____wweeaakkrreeff____
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.IOError:
+     |  
+     |  ____iinniitt____(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from exceptions.IOError:
+     |  
+     |  ____nneeww____ = <built-in method __new__ of type object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.EnvironmentError:
+     |  
+     |  ____rreedduuccee____(...)
+     |  
+     |  ____ssttrr____(...)
+     |      x.__str__() <==> str(x)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.EnvironmentError:
+     |  
+     |  eerrrrnnoo
+     |      exception errno
+     |  
+     |  ffiilleennaammee
+     |      exception filename
+     |  
+     |  ssttrreerrrroorr
+     |      exception strerror
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.BaseException:
+     |  
+     |  ____ddeellaattttrr____(...)
+     |      x.__delattr__('name') <==> del x.name
+     |  
+     |  ____ggeettaattttrriibbuuttee____(...)
+     |      x.__getattribute__('name') <==> x.name
+     |  
+     |  ____ggeettiitteemm____(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  ____ggeettsslliiccee____(...)
+     |      x.__getslice__(i, j) <==> x[i:j]
+     |      
+     |      Use of negative indices is not supported.
+     |  
+     |  ____rreepprr____(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  ____sseettaattttrr____(...)
+     |      x.__setattr__('name', value) <==> x.name = value
+     |  
+     |  ____sseettssttaattee____(...)
+     |  
+     |  ____uunniiccooddee____(...)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.BaseException:
+     |  
+     |  ____ddiicctt____
+     |  
+     |  aarrggss
+     |  
+     |  mmeessssaaggee
+    
+    class hheerrrroorr(error)
+     |  Method resolution order:
+     |      herror
+     |      error
+     |      exceptions.IOError
+     |      exceptions.EnvironmentError
+     |      exceptions.StandardError
+     |      exceptions.Exception
+     |      exceptions.BaseException
+     |      __builtin__.object
+     |  
+     |  Data descriptors inherited from error:
+     |  
+     |  ____wweeaakkrreeff____
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.IOError:
+     |  
+     |  ____iinniitt____(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from exceptions.IOError:
+     |  
+     |  ____nneeww____ = <built-in method __new__ of type object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.EnvironmentError:
+     |  
+     |  ____rreedduuccee____(...)
+     |  
+     |  ____ssttrr____(...)
+     |      x.__str__() <==> str(x)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.EnvironmentError:
+     |  
+     |  eerrrrnnoo
+     |      exception errno
+     |  
+     |  ffiilleennaammee
+     |      exception filename
+     |  
+     |  ssttrreerrrroorr
+     |      exception strerror
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.BaseException:
+     |  
+     |  ____ddeellaattttrr____(...)
+     |      x.__delattr__('name') <==> del x.name
+     |  
+     |  ____ggeettaattttrriibbuuttee____(...)
+     |      x.__getattribute__('name') <==> x.name
+     |  
+     |  ____ggeettiitteemm____(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  ____ggeettsslliiccee____(...)
+     |      x.__getslice__(i, j) <==> x[i:j]
+     |      
+     |      Use of negative indices is not supported.
+     |  
+     |  ____rreepprr____(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  ____sseettaattttrr____(...)
+     |      x.__setattr__('name', value) <==> x.name = value
+     |  
+     |  ____sseettssttaattee____(...)
+     |  
+     |  ____uunniiccooddee____(...)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.BaseException:
+     |  
+     |  ____ddiicctt____
+     |  
+     |  aarrggss
+     |  
+     |  mmeessssaaggee
+    
+    ssoocckkeett = class _socketobject(__builtin__.object)
+     |  socket([family[, type[, proto]]]) -> socket object
+     |  
+     |  Open a socket of the given type.  The family argument specifies the
+     |  address family; it defaults to AF_INET.  The type argument specifies
+     |  whether this is a stream (SOCK_STREAM, this is the default)
+     |  or datagram (SOCK_DGRAM) socket.  The protocol argument defaults to 0,
+     |  specifying the default protocol.  Keyword arguments are accepted.
+     |  
+     |  A socket object represents one endpoint of a network connection.
+     |  
+     |  Methods of socket objects (keyword arguments not allowed):
+     |  
+     |  accept() -- accept a connection, returning new socket and client address
+     |  bind(addr) -- bind the socket to a local address
+     |  close() -- close the socket
+     |  connect(addr) -- connect the socket to a remote address
+     |  connect_ex(addr) -- connect, return an error code instead of an exception
+     |  dup() -- return a new socket object identical to the current one [*]
+     |  fileno() -- return underlying file descriptor
+     |  getpeername() -- return remote address [*]
+     |  getsockname() -- return local address
+     |  getsockopt(level, optname[, buflen]) -- get socket options
+     |  gettimeout() -- return timeout or None
+     |  listen(n) -- start listening for incoming connections
+     |  makefile([mode, [bufsize]]) -- return a file object for the socket [*]
+     |  recv(buflen[, flags]) -- receive data
+     |  recv_into(buffer[, nbytes[, flags]]) -- receive data (into a buffer)
+     |  recvfrom(buflen[, flags]) -- receive data and sender's address
+     |  recvfrom_into(buffer[, nbytes, [, flags])
+     |    -- receive data and sender's address (into a buffer)
+     |  sendall(data[, flags]) -- send all data
+     |  send(data[, flags]) -- send data, may not send all of it
+     |  sendto(data[, flags], addr) -- send data to a given address
+     |  setblocking(0 | 1) -- set or clear the blocking I/O flag
+     |  setsockopt(level, optname, value) -- set socket options
+     |  settimeout(None | float) -- set or clear the timeout
+     |  shutdown(how) -- shut down traffic in one or both directions
+     |  
+     |   [*] not available on all platforms!
+     |  
+     |  Methods defined here:
+     |  
+     |  ____iinniitt____(self, family=2, type=1, proto=0, _sock=None)
+     |  
+     |  aacccceepptt(self)
+     |      accept() -> (socket object, address info)
+     |      
+     |      Wait for an incoming connection.  Return a new socket representing the
+     |      connection, and the address of the client.  For IP sockets, the address
+     |      info is a pair (hostaddr, port).
+     |  
+     |  bbiinndd(...)
+     |      bind(address)
+     |      
+     |      Bind the socket to a local address.  For IP sockets, the address is a
+     |      pair (host, port); the host must refer to the local host. For raw packet
+     |      sockets the address is a tuple (ifname, proto [,pkttype [,hatype]])
+     |  
+     |  cclloossee(self, _closedsocket=<class 'socket._closedsocket'>, _delegate_methods=('recv', 'recvfrom', 'recv_into', 'recvfrom_into', 'send', 'sendto'), setattr=<built-in function setattr>)
+     |      close()
+     |      
+     |      Close the socket.  It cannot be used after this call.
+     |  
+     |  ccoonnnneecctt(...)
+     |      connect(address)
+     |      
+     |      Connect the socket to a remote address.  For IP sockets, the address
+     |      is a pair (host, port).
+     |  
+     |  ccoonnnneecctt__eexx(...)
+     |      connect_ex(address) -> errno
+     |      
+     |      This is like connect(address), but returns an error code (the errno value)
+     |      instead of raising an exception when an error occurs.
+     |  
+     |  dduupp(self)
+     |      dup() -> socket object
+     |      
+     |      Return a new socket object connected to the same system resource.
+     |  
+     |  ffiilleennoo(...)
+     |      fileno() -> integer
+     |      
+     |      Return the integer file descriptor of the socket.
+     |  
+     |  ggeettppeeeerrnnaammee(...)
+     |      getpeername() -> address info
+     |      
+     |      Return the address of the remote endpoint.  For IP sockets, the address
+     |      info is a pair (hostaddr, port).
+     |  
+     |  ggeettssoocckknnaammee(...)
+     |      getsockname() -> address info
+     |      
+     |      Return the address of the local endpoint.  For IP sockets, the address
+     |      info is a pair (hostaddr, port).
+     |  
+     |  ggeettssoocckkoopptt(...)
+     |      getsockopt(level, option[, buffersize]) -> value
+     |      
+     |      Get a socket option.  See the Unix manual for level and option.
+     |      If a nonzero buffersize argument is given, the return value is a
+     |      string of that length; otherwise it is an integer.
+     |  
+     |  ggeettttiimmeeoouutt(...)
+     |      gettimeout() -> timeout
+     |      
+     |      Returns the timeout in seconds (float) associated with socket 
+     |      operations. A timeout of None indicates that timeouts on socket 
+     |      operations are disabled.
+     |  
+     |  lliisstteenn(...)
+     |      listen(backlog)
+     |      
+     |      Enable a server to accept connections.  The backlog argument must be at
+     |      least 0 (if it is lower, it is set to 0); it specifies the number of
+     |      unaccepted connections that the system will allow before refusing new
+     |      connections.
+     |  
+     |  mmaakkeeffiillee(self, mode='r', bufsize=-1)
+     |      makefile([mode[, bufsize]]) -> file object
+     |      
+     |      Return a regular file object corresponding to the socket.  The mode
+     |      and bufsize arguments are as for the built-in open() function.
+     |  
+     |  sseennddaallll(...)
+     |      sendall(data[, flags])
+     |      
+     |      Send a data string to the socket.  For the optional flags
+     |      argument, see the Unix manual.  This calls send() repeatedly
+     |      until all data is sent.  If an error occurs, it's impossible
+     |      to tell how much data has been sent.
+     |  
+     |  sseettbblloocckkiinngg(...)
+     |      setblocking(flag)
+     |      
+     |      Set the socket to blocking (flag is true) or non-blocking (false).
+     |      setblocking(True) is equivalent to settimeout(None);
+     |      setblocking(False) is equivalent to settimeout(0.0).
+     |  
+     |  sseettssoocckkoopptt(...)
+     |      setsockopt(level, option, value)
+     |      
+     |      Set a socket option.  See the Unix manual for level and option.
+     |      The value argument can either be an integer or a string.
+     |  
+     |  sseettttiimmeeoouutt(...)
+     |      settimeout(timeout)
+     |      
+     |      Set a timeout on socket operations.  'timeout' can be a float,
+     |      giving in seconds, or None.  Setting a timeout of None disables
+     |      the timeout feature and is equivalent to setblocking(1).
+     |      Setting a timeout of zero is the same as setblocking(0).
+     |  
+     |  sshhuuttddoowwnn(...)
+     |      shutdown(flag)
+     |      
+     |      Shut down the reading side of the socket (flag == SHUT_RD), the writing side
+     |      of the socket (flag == SHUT_WR), or both ends (flag == SHUT_RDWR).
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  ____wweeaakkrreeff____
+     |      list of weak references to the object (if defined)
+     |  
+     |  ffaammiillyy
+     |      the socket family
+     |  
+     |  pprroottoo
+     |      the socket protocol
+     |  
+     |  rreeccvv
+     |  
+     |  rreeccvv__iinnttoo
+     |  
+     |  rreeccvvffrroomm
+     |  
+     |  rreeccvvffrroomm__iinnttoo
+     |  
+     |  sseenndd
+     |  
+     |  sseennddttoo
+     |  
+     |  ttyyppee
+     |      the socket type
+    
+    class ttiimmeeoouutt(error)
+     |  Method resolution order:
+     |      timeout
+     |      error
+     |      exceptions.IOError
+     |      exceptions.EnvironmentError
+     |      exceptions.StandardError
+     |      exceptions.Exception
+     |      exceptions.BaseException
+     |      __builtin__.object
+     |  
+     |  Data descriptors inherited from error:
+     |  
+     |  ____wweeaakkrreeff____
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.IOError:
+     |  
+     |  ____iinniitt____(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from exceptions.IOError:
+     |  
+     |  ____nneeww____ = <built-in method __new__ of type object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.EnvironmentError:
+     |  
+     |  ____rreedduuccee____(...)
+     |  
+     |  ____ssttrr____(...)
+     |      x.__str__() <==> str(x)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.EnvironmentError:
+     |  
+     |  eerrrrnnoo
+     |      exception errno
+     |  
+     |  ffiilleennaammee
+     |      exception filename
+     |  
+     |  ssttrreerrrroorr
+     |      exception strerror
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from exceptions.BaseException:
+     |  
+     |  ____ddeellaattttrr____(...)
+     |      x.__delattr__('name') <==> del x.name
+     |  
+     |  ____ggeettaattttrriibbuuttee____(...)
+     |      x.__getattribute__('name') <==> x.name
+     |  
+     |  ____ggeettiitteemm____(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  ____ggeettsslliiccee____(...)
+     |      x.__getslice__(i, j) <==> x[i:j]
+     |      
+     |      Use of negative indices is not supported.
+     |  
+     |  ____rreepprr____(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  ____sseettaattttrr____(...)
+     |      x.__setattr__('name', value) <==> x.name = value
+     |  
+     |  ____sseettssttaattee____(...)
+     |  
+     |  ____uunniiccooddee____(...)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from exceptions.BaseException:
+     |  
+     |  ____ddiicctt____
+     |  
+     |  aarrggss
+     |  
+     |  mmeessssaaggee
+
+FFUUNNCCTTIIOONNSS
+    ccrreeaattee__ccoonnnneeccttiioonn(address, timeout=<object object>, source_address=None)
+        Connect to *address* and return the socket object.
+        
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        A host of '' or port 0 tells the OS to use the default.
+    
+    ffrroommffdd(...)
+        fromfd(fd, family, type[, proto]) -> socket object
+        
+        Create a socket object from a duplicate of the given
+        file descriptor.
+        The remaining arguments are the same as for socket().
+    
+    ggeettaaddddrriinnffoo(...)
+        getaddrinfo(host, port [, family, socktype, proto, flags])
+            -> list of (family, socktype, proto, canonname, sockaddr)
+        
+        Resolve host and port into addrinfo struct.
+    
+    ggeettddeeffaauullttttiimmeeoouutt(...)
+        getdefaulttimeout() -> timeout
+        
+        Returns the default timeout in seconds (float) for new socket objects.
+        A value of None indicates that new socket objects have no timeout.
+        When the socket module is first imported, the default is None.
+    
+    ggeettffqqddnn(name='')
+        Get fully qualified domain name from name.
+        
+        An empty argument is interpreted as meaning the local host.
+        
+        First the hostname returned by gethostbyaddr() is checked, then
+        possibly existing aliases. In case no FQDN is available, hostname
+        from gethostname() is returned.
+    
+    ggeetthhoossttbbyyaaddddrr(...)
+        gethostbyaddr(host) -> (name, aliaslist, addresslist)
+        
+        Return the true host name, a list of aliases, and a list of IP addresses,
+        for a host.  The host argument is a string giving a host name or IP number.
+    
+    ggeetthhoossttbbyynnaammee(...)
+        gethostbyname(host) -> address
+        
+        Return the IP address (a string of the form '255.255.255.255') for a host.
+    
+    ggeetthhoossttbbyynnaammee__eexx(...)
+        gethostbyname_ex(host) -> (name, aliaslist, addresslist)
+        
+        Return the true host name, a list of aliases, and a list of IP addresses,
+        for a host.  The host argument is a string giving a host name or IP number.
+    
+    ggeetthhoossttnnaammee(...)
+        gethostname() -> string
+        
+        Return the current host name.
+    
+    ggeettnnaammeeiinnffoo(...)
+        getnameinfo(sockaddr, flags) --> (host, port)
+        
+        Get host and port for a sockaddr.
+    
+    ggeettpprroottoobbyynnaammee(...)
+        getprotobyname(name) -> integer
+        
+        Return the protocol number for the named protocol.  (Rarely used.)
+    
+    ggeettsseerrvvbbyynnaammee(...)
+        getservbyname(servicename[, protocolname]) -> integer
+        
+        Return a port number from a service name and protocol name.
+        The optional protocol name, if given, should be 'tcp' or 'udp',
+        otherwise any protocol will match.
+    
+    ggeettsseerrvvbbyyppoorrtt(...)
+        getservbyport(port[, protocolname]) -> string
+        
+        Return the service name from a port number and protocol name.
+        The optional protocol name, if given, should be 'tcp' or 'udp',
+        otherwise any protocol will match.
+    
+    hhttoonnll(...)
+        htonl(integer) -> integer
+        
+        Convert a 32-bit integer from host to network byte order.
+    
+    hhttoonnss(...)
+        htons(integer) -> integer
+        
+        Convert a 16-bit integer from host to network byte order.
+    
+    iinneett__aattoonn(...)
+        inet_aton(string) -> packed 32-bit IP representation
+        
+        Convert an IP address in string format (123.45.67.89) to the 32-bit packed
+        binary format used in low-level network functions.
+    
+    iinneett__nnttooaa(...)
+        inet_ntoa(packed_ip) -> ip_address_string
+        
+        Convert an IP address from 32-bit packed binary format to string format
+    
+    iinneett__nnttoopp(...)
+        inet_ntop(af, packed_ip) -> string formatted IP address
+        
+        Convert a packed IP address of the given family to string format.
+    
+    iinneett__ppttoonn(...)
+        inet_pton(af, ip) -> packed IP address string
+        
+        Convert an IP address from string format to a packed string suitable
+        for use with low-level network functions.
+    
+    nnttoohhll(...)
+        ntohl(integer) -> integer
+        
+        Convert a 32-bit integer from network to host byte order.
+    
+    nnttoohhss(...)
+        ntohs(integer) -> integer
+        
+        Convert a 16-bit integer from network to host byte order.
+    
+    sseettddeeffaauullttttiimmeeoouutt(...)
+        setdefaulttimeout(timeout)
+        
+        Set the default timeout in seconds (float) for new socket objects.
+        A value of None indicates that new socket objects have no timeout.
+        When the socket module is first imported, the default is None.
+    
+    ssoocckkeettppaaiirr(...)
+        socketpair([family[, type[, proto]]]) -> (socket object, socket object)
+        
+        Create a pair of socket objects from the sockets returned by the platform
+        socketpair() function.
+        The arguments are the same as for socket() except the default family is
+        AF_UNIX if defined on the platform; otherwise, the default is AF_INET.
+
+DDAATTAA
+    AAFF__AAPPPPLLEETTAALLKK = 5
+    AAFF__AASSHH = 18
+    AAFF__AATTMMPPVVCC = 8
+    AAFF__AATTMMSSVVCC = 20
+    AAFF__AAXX2255 = 3
+    AAFF__BBLLUUEETTOOOOTTHH = 31
+    AAFF__BBRRIIDDGGEE = 7
+    AAFF__DDEECCnneett = 12
+    AAFF__EECCOONNEETT = 19
+    AAFF__IINNEETT = 2
+    AAFF__IINNEETT66 = 10
+    AAFF__IIPPXX = 4
+    AAFF__IIRRDDAA = 23
+    AAFF__KKEEYY = 15
+    AAFF__LLLLCC = 26
+    AAFF__NNEETTBBEEUUII = 13
+    AAFF__NNEETTLLIINNKK = 16
+    AAFF__NNEETTRROOMM = 6
+    AAFF__PPAACCKKEETT = 17
+    AAFF__PPPPPPOOXX = 24
+    AAFF__RROOSSEE = 11
+    AAFF__RROOUUTTEE = 16
+    AAFF__SSEECCUURRIITTYY = 14
+    AAFF__SSNNAA = 22
+    AAFF__TTIIPPCC = 30
+    AAFF__UUNNIIXX = 1
+    AAFF__UUNNSSPPEECC = 0
+    AAFF__WWAANNPPIIPPEE = 25
+    AAFF__XX2255 = 9
+    AAII__AADDDDRRCCOONNFFIIGG = 32
+    AAII__AALLLL = 16
+    AAII__CCAANNOONNNNAAMMEE = 2
+    AAII__NNUUMMEERRIICCHHOOSSTT = 4
+    AAII__NNUUMMEERRIICCSSEERRVV = 1024
+    AAII__PPAASSSSIIVVEE = 1
+    AAII__VV44MMAAPPPPEEDD = 8
+    BBDDAADDDDRR__AANNYY = '00:00:00:00:00:00'
+    BBDDAADDDDRR__LLOOCCAALL = '00:00:00:FF:FF:FF'
+    BBTTPPRROOTTOO__HHCCII = 1
+    BBTTPPRROOTTOO__LL22CCAAPP = 0
+    BBTTPPRROOTTOO__RRFFCCOOMMMM = 3
+    BBTTPPRROOTTOO__SSCCOO = 2
+    CCAAPPII = <capsule object "_socket.CAPI">
+    EEAAII__AADDDDRRFFAAMMIILLYY = -9
+    EEAAII__AAGGAAIINN = -3
+    EEAAII__BBAADDFFLLAAGGSS = -1
+    EEAAII__FFAAIILL = -4
+    EEAAII__FFAAMMIILLYY = -6
+    EEAAII__MMEEMMOORRYY = -10
+    EEAAII__NNOODDAATTAA = -5
+    EEAAII__NNOONNAAMMEE = -2
+    EEAAII__OOVVEERRFFLLOOWW = -12
+    EEAAII__SSEERRVVIICCEE = -8
+    EEAAII__SSOOCCKKTTYYPPEE = -7
+    EEAAII__SSYYSSTTEEMM = -11
+    HHCCII__DDAATTAA__DDIIRR = 1
+    HHCCII__FFIILLTTEERR = 2
+    HHCCII__TTIIMMEE__SSTTAAMMPP = 3
+    IINNAADDDDRR__AALLLLHHOOSSTTSS__GGRROOUUPP = 3758096385
+    IINNAADDDDRR__AANNYY = 0
+    IINNAADDDDRR__BBRROOAADDCCAASSTT = 4294967295
+    IINNAADDDDRR__LLOOOOPPBBAACCKK = 2130706433
+    IINNAADDDDRR__MMAAXX__LLOOCCAALL__GGRROOUUPP = 3758096639
+    IINNAADDDDRR__NNOONNEE = 4294967295
+    IINNAADDDDRR__UUNNSSPPEECC__GGRROOUUPP = 3758096384
+    IIPPPPOORRTT__RREESSEERRVVEEDD = 1024
+    IIPPPPOORRTT__UUSSEERRRREESSEERRVVEEDD = 5000
+    IIPPPPRROOTTOO__AAHH = 51
+    IIPPPPRROOTTOO__DDSSTTOOPPTTSS = 60
+    IIPPPPRROOTTOO__EEGGPP = 8
+    IIPPPPRROOTTOO__EESSPP = 50
+    IIPPPPRROOTTOO__FFRRAAGGMMEENNTT = 44
+    IIPPPPRROOTTOO__GGRREE = 47
+    IIPPPPRROOTTOO__HHOOPPOOPPTTSS = 0
+    IIPPPPRROOTTOO__IICCMMPP = 1
+    IIPPPPRROOTTOO__IICCMMPPVV66 = 58
+    IIPPPPRROOTTOO__IIDDPP = 22
+    IIPPPPRROOTTOO__IIGGMMPP = 2
+    IIPPPPRROOTTOO__IIPP = 0
+    IIPPPPRROOTTOO__IIPPIIPP = 4
+    IIPPPPRROOTTOO__IIPPVV66 = 41
+    IIPPPPRROOTTOO__NNOONNEE = 59
+    IIPPPPRROOTTOO__PPIIMM = 103
+    IIPPPPRROOTTOO__PPUUPP = 12
+    IIPPPPRROOTTOO__RRAAWW = 255
+    IIPPPPRROOTTOO__RROOUUTTIINNGG = 43
+    IIPPPPRROOTTOO__RRSSVVPP = 46
+    IIPPPPRROOTTOO__TTCCPP = 6
+    IIPPPPRROOTTOO__TTPP = 29
+    IIPPPPRROOTTOO__UUDDPP = 17
+    IIPPVV66__CCHHEECCKKSSUUMM = 7
+    IIPPVV66__DDOONNTTFFRRAAGG = 62
+    IIPPVV66__DDSSTTOOPPTTSS = 59
+    IIPPVV66__HHOOPPLLIIMMIITT = 52
+    IIPPVV66__HHOOPPOOPPTTSS = 54
+    IIPPVV66__JJOOIINN__GGRROOUUPP = 20
+    IIPPVV66__LLEEAAVVEE__GGRROOUUPP = 21
+    IIPPVV66__MMUULLTTIICCAASSTT__HHOOPPSS = 18
+    IIPPVV66__MMUULLTTIICCAASSTT__IIFF = 17
+    IIPPVV66__MMUULLTTIICCAASSTT__LLOOOOPP = 19
+    IIPPVV66__NNEEXXTTHHOOPP = 9
+    IIPPVV66__PPAATTHHMMTTUU = 61
+    IIPPVV66__PPKKTTIINNFFOO = 50
+    IIPPVV66__RREECCVVDDSSTTOOPPTTSS = 58
+    IIPPVV66__RREECCVVHHOOPPLLIIMMIITT = 51
+    IIPPVV66__RREECCVVHHOOPPOOPPTTSS = 53
+    IIPPVV66__RREECCVVPPAATTHHMMTTUU = 60
+    IIPPVV66__RREECCVVPPKKTTIINNFFOO = 49
+    IIPPVV66__RREECCVVRRTTHHDDRR = 56
+    IIPPVV66__RREECCVVTTCCLLAASSSS = 66
+    IIPPVV66__RRTTHHDDRR = 57
+    IIPPVV66__RRTTHHDDRRDDSSTTOOPPTTSS = 55
+    IIPPVV66__RRTTHHDDRR__TTYYPPEE__00 = 0
+    IIPPVV66__TTCCLLAASSSS = 67
+    IIPPVV66__UUNNIICCAASSTT__HHOOPPSS = 16
+    IIPPVV66__VV66OONNLLYY = 26
+    IIPP__AADDDD__MMEEMMBBEERRSSHHIIPP = 35
+    IIPP__DDEEFFAAUULLTT__MMUULLTTIICCAASSTT__LLOOOOPP = 1
+    IIPP__DDEEFFAAUULLTT__MMUULLTTIICCAASSTT__TTTTLL = 1
+    IIPP__DDRROOPP__MMEEMMBBEERRSSHHIIPP = 36
+    IIPP__HHDDRRIINNCCLL = 3
+    IIPP__MMAAXX__MMEEMMBBEERRSSHHIIPPSS = 20
+    IIPP__MMUULLTTIICCAASSTT__IIFF = 32
+    IIPP__MMUULLTTIICCAASSTT__LLOOOOPP = 34
+    IIPP__MMUULLTTIICCAASSTT__TTTTLL = 33
+    IIPP__OOPPTTIIOONNSS = 4
+    IIPP__RREECCVVOOPPTTSS = 6
+    IIPP__RREECCVVRREETTOOPPTTSS = 7
+    IIPP__RREETTOOPPTTSS = 7
+    IIPP__TTOOSS = 1
+    IIPP__TTTTLL = 2
+    MMSSGG__CCTTRRUUNNCC = 8
+    MMSSGG__DDOONNTTRROOUUTTEE = 4
+    MMSSGG__DDOONNTTWWAAIITT = 64
+    MMSSGG__EEOORR = 128
+    MMSSGG__OOOOBB = 1
+    MMSSGG__PPEEEEKK = 2
+    MMSSGG__TTRRUUNNCC = 32
+    MMSSGG__WWAAIITTAALLLL = 256
+    NNEETTLLIINNKK__DDNNRRTTMMSSGG = 14
+    NNEETTLLIINNKK__FFIIRREEWWAALLLL = 3
+    NNEETTLLIINNKK__IIPP66__FFWW = 13
+    NNEETTLLIINNKK__NNFFLLOOGG = 5
+    NNEETTLLIINNKK__RROOUUTTEE = 0
+    NNEETTLLIINNKK__UUSSEERRSSOOCCKK = 2
+    NNEETTLLIINNKK__XXFFRRMM = 6
+    NNII__DDGGRRAAMM = 16
+    NNII__MMAAXXHHOOSSTT = 1025
+    NNII__MMAAXXSSEERRVV = 32
+    NNII__NNAAMMEERREEQQDD = 8
+    NNII__NNOOFFQQDDNN = 4
+    NNII__NNUUMMEERRIICCHHOOSSTT = 1
+    NNII__NNUUMMEERRIICCSSEERRVV = 2
+    PPAACCKKEETT__BBRROOAADDCCAASSTT = 1
+    PPAACCKKEETT__FFAASSTTRROOUUTTEE = 6
+    PPAACCKKEETT__HHOOSSTT = 0
+    PPAACCKKEETT__LLOOOOPPBBAACCKK = 5
+    PPAACCKKEETT__MMUULLTTIICCAASSTT = 2
+    PPAACCKKEETT__OOTTHHEERRHHOOSSTT = 3
+    PPAACCKKEETT__OOUUTTGGOOIINNGG = 4
+    PPFF__PPAACCKKEETT = 17
+    SSHHUUTT__RRDD = 0
+    SSHHUUTT__RRDDWWRR = 2
+    SSHHUUTT__WWRR = 1
+    SSOOCCKK__DDGGRRAAMM = 2
+    SSOOCCKK__RRAAWW = 3
+    SSOOCCKK__RRDDMM = 4
+    SSOOCCKK__SSEEQQPPAACCKKEETT = 5
+    SSOOCCKK__SSTTRREEAAMM = 1
+    SSOOLL__HHCCII = 0
+    SSOOLL__IIPP = 0
+    SSOOLL__SSOOCCKKEETT = 1
+    SSOOLL__TTCCPP = 6
+    SSOOLL__TTIIPPCC = 271
+    SSOOLL__UUDDPP = 17
+    SSOOMMAAXXCCOONNNN = 128
+    SSOO__AACCCCEEPPTTCCOONNNN = 30
+    SSOO__BBRROOAADDCCAASSTT = 6
+    SSOO__DDEEBBUUGG = 1
+    SSOO__DDOONNTTRROOUUTTEE = 5
+    SSOO__EERRRROORR = 4
+    SSOO__KKEEEEPPAALLIIVVEE = 9
+    SSOO__LLIINNGGEERR = 13
+    SSOO__OOOOBBIINNLLIINNEE = 10
+    SSOO__RRCCVVBBUUFF = 8
+    SSOO__RRCCVVLLOOWWAATT = 18
+    SSOO__RRCCVVTTIIMMEEOO = 20
+    SSOO__RREEUUSSEEAADDDDRR = 2
+    SSOO__RREEUUSSEEPPOORRTT = 15
+    SSOO__SSNNDDBBUUFF = 7
+    SSOO__SSNNDDLLOOWWAATT = 19
+    SSOO__SSNNDDTTIIMMEEOO = 21
+    SSOO__TTYYPPEE = 3
+    TTCCPP__CCOORRKK = 3
+    TTCCPP__DDEEFFEERR__AACCCCEEPPTT = 9
+    TTCCPP__IINNFFOO = 11
+    TTCCPP__KKEEEEPPCCNNTT = 6
+    TTCCPP__KKEEEEPPIIDDLLEE = 4
+    TTCCPP__KKEEEEPPIINNTTVVLL = 5
+    TTCCPP__LLIINNGGEERR22 = 8
+    TTCCPP__MMAAXXSSEEGG = 2
+    TTCCPP__NNOODDEELLAAYY = 1
+    TTCCPP__QQUUIICCKKAACCKK = 12
+    TTCCPP__SSYYNNCCNNTT = 7
+    TTCCPP__WWIINNDDOOWW__CCLLAAMMPP = 10
+    TTIIPPCC__AADDDDRR__IIDD = 3
+    TTIIPPCC__AADDDDRR__NNAAMMEE = 2
+    TTIIPPCC__AADDDDRR__NNAAMMEESSEEQQ = 1
+    TTIIPPCC__CCFFGG__SSRRVV = 0
+    TTIIPPCC__CCLLUUSSTTEERR__SSCCOOPPEE = 2
+    TTIIPPCC__CCOONNNN__TTIIMMEEOOUUTT = 130
+    TTIIPPCC__CCRRIITTIICCAALL__IIMMPPOORRTTAANNCCEE = 3
+    TTIIPPCC__DDEESSTT__DDRROOPPPPAABBLLEE = 129
+    TTIIPPCC__HHIIGGHH__IIMMPPOORRTTAANNCCEE = 2
+    TTIIPPCC__IIMMPPOORRTTAANNCCEE = 127
+    TTIIPPCC__LLOOWW__IIMMPPOORRTTAANNCCEE = 0
+    TTIIPPCC__MMEEDDIIUUMM__IIMMPPOORRTTAANNCCEE = 1
+    TTIIPPCC__NNOODDEE__SSCCOOPPEE = 3
+    TTIIPPCC__PPUUBBLLIISSHHEEDD = 1
+    TTIIPPCC__SSRRCC__DDRROOPPPPAABBLLEE = 128
+    TTIIPPCC__SSUUBBSSCCRR__TTIIMMEEOOUUTT = 3
+    TTIIPPCC__SSUUBB__CCAANNCCEELL = 4
+    TTIIPPCC__SSUUBB__PPOORRTTSS = 1
+    TTIIPPCC__SSUUBB__SSEERRVVIICCEE = 2
+    TTIIPPCC__TTOOPP__SSRRVV = 1
+    TTIIPPCC__WWAAIITT__FFOORREEVVEERR = -1
+    TTIIPPCC__WWIITTHHDDRRAAWWNN = 2
+    TTIIPPCC__ZZOONNEE__SSCCOOPPEE = 1
+    ____aallll____ = ['getfqdn', 'create_connection', 'AF_APPLETALK', 'AF_ASH', '...
+    hhaass__iippvv66 = True
+
