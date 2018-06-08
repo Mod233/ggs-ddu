@@ -24,6 +24,8 @@
 #define KNOW_INTRANET 1
 #define KNOW_EXTRANET 0
 #define HOLE_SIZE 600
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MIN(a,b) ((a)>(b)?(b):(a))
 unsigned int subnet_intranet = ntohl(inet_addr("10.0.0.0")); //存储子网ip，用于区分内部IP地址和外部IP地址
 unsigned int subnet_extranet = ntohl(inet_addr("108.0.0.0")); //存储子网ip，用于区分内部IP地址和外部IP地址
 unsigned int subnet_mask = ntohl(inet_addr("255.0.0.0"));  //设定子网掩码，用于区获取子网号
@@ -57,6 +59,22 @@ void dns_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 	if (dnslen < 1)
 		return;
 	int ip_num = ip_mkhash(ipptr->saddr, ipptr->daddr);
+	// new add
+	if (all_flow[ip_num].tcp.pkt_num + all_flow[ip_num].dns.pkt_num) {
+		if (MAX(ipptr->saddr, ipptr->daddr) != all_flow[ip_num].ip_big
+				&& MIN(ipptr->saddr, ipptr->daddr)
+						!= all_flow[ip_num].ip_small) {
+			if (all_flow[ip_num].crash_num > 90)
+				memset(&all_flow[ip_num], 0, sizeof(flow_vector));
+			else {
+				all_flow[ip_num].crash_num++;
+				return;
+			}
+		} else {
+			all_flow[ip_num].crash_num = 0;
+		}
+	}
+	// finish
 	if (dport == uint16_t(53)) {
 		all_flow[ip_num].dns.upload_num++;
 		all_flow[ip_num].dns.upload += dnslen;
@@ -223,6 +241,22 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 #endif
 	int ip_num = ip_mkhash(tag ? ipptr->saddr : ipptr->daddr,
 			tag ? ipptr->daddr : ipptr->saddr);
+	// new add
+	if (all_flow[ip_num].tcp.pkt_num + all_flow[ip_num].dns.pkt_num) {
+		if (MAX(ipptr->saddr, ipptr->daddr) != all_flow[ip_num].ip_big
+				&& MIN(ipptr->saddr, ipptr->daddr)
+						!= all_flow[ip_num].ip_small) {
+			if (all_flow[ip_num].crash_num > 90)
+				memset(&all_flow[ip_num], 0, sizeof(flow_vector));
+			else {
+				all_flow[ip_num].crash_num++;
+				return;
+			}
+		} else {
+			all_flow[ip_num].crash_num = 0;
+		}
+	}
+	// finish
 	int cnt = all_flow[ip_num].tcp.pkt_num;
 	all_flow[ip_num].tcp.pkt_size[cnt] = hdr.caplen;
 	all_flow[ip_num].tcp.pkt_tag[cnt] = tag;
