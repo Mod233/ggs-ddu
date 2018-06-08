@@ -175,6 +175,8 @@ static double ceil(double x)
    return ret;
 }//向上取整
 
+
+//cluster:每个时间片 lengthD:时间片数量 ite:心跳集合
 int apriori(cluster* cluster, int lengthD, float minSup, set* ite)
 {
 	//'''频繁项集用keys表示，
@@ -200,7 +202,6 @@ int apriori(cluster* cluster, int lengthD, float minSup, set* ite)
 			else
 			{
 				ListAdd(&L,cluster[i].packet_size_list[j]);
-
 			}
 		}
 	}

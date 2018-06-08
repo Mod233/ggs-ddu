@@ -44,7 +44,10 @@ void highlight_output(int color_id, char*msg){
 	printf("\033[1;%dm%s\033[1;0m\n", color_id, msg);
 }
 
+
+
 int dns_ip(char*dir, std::string result){
+
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* descr;
     const u_char *packet;
@@ -52,40 +55,49 @@ int dns_ip(char*dir, std::string result){
     struct ether_header *eptr;  /* net/ethernet.h */
     struct iphdr *ipptr;
     struct udphdr *udpptr;
-    descr = pcap_open_offline(dir, errbuf);
-    if(descr == NULL)
-    {
+    struct tcphdr *tcpptr;
+    descr = pcap_open_offline(dir,errbuf);
+    if(descr == NULL){
         printf("pcap_open_offlive(): %s\n",errbuf);
         pcap_close(descr);
         return 0;
     }
     show.clear();
     while(true){
-    	packet = pcap_next(descr, &hdr);
-    	if(packet == NULL)
-    		break;
+    	packet = pcap_next(descr,&hdr);
+    	if(packet == NULL) break;
     	eptr = (struct ether_header *) packet;
-    	if(ntohs(eptr->ether_type) != 0x800) continue;
+    	if(ntohs(eptr->ether_type)!=0x800) continue;
     	ipptr = (struct iphdr *) (packet+sizeof(ether_header));
     	if(ipptr->version != 4) continue;
-    	struct in_addr srcip, dstip;
+    	struct in_addr srcip,dstip;
     	srcip.s_addr = in_addr_t(ipptr->saddr);
     	dstip.s_addr = in_addr_t(ipptr->daddr);
     	if(ipptr->protocol != 17) continue;
+    	//if(ntohs(ipptr->tot_len) < 42) continue;
     	udpptr = (struct udphdr *)(packet+sizeof(ether_header)+(ipptr->ihl)*4);
-    	uint16_t sport = ntohs(udpptr->source);
     	uint16_t dport = ntohs(udpptr->dest);
+    	uint16_t sport = ntohs(udpptr->source);
+    	if( dport != uint16_t(53) && sport != uint16_t(53)) continue;
+    	if(hdr.caplen - (sizeof(ether_header) + (ipptr->ihl)*4 + 8) == 0) continue;
+
+
+
     	std::string sip=inet_ntoa(srcip);
     	std::string dip=inet_ntoa(dstip);
-    	if(dport != uint16_t(53) && sport != uint16_t(53)) continue;
     	std::string name;
-    	if(dport == uint16_t(53)) name = dip+"-"+sip; //+":"+to_string(sport);
-    	else name = sip + "-" + dip; //+":"+to_string(dport);
-    	name = result + "/dns/" + name + std::string(".pcap");
+    	name = min(sip, dip) + '-' + max(sip, dip);
     	FILE* pFile;
-    	if(show.count(name)){
+    	if(show.count(name))
     		show[name]++;
-    		pFile = fopen(name.c_str(),"a");
+    	else show[name]=0;
+    	std::string filedir = result + "/dns/" + name;
+    	int flag = mkdir(filedir.c_str(), 0777);
+   // 	if(flag!=0) printf("mkdir file %s failed\n", filedir.c_str());
+    	if(show[name]%300!=0){
+    		char filename[100];
+    		sprintf(filename, "%s/%s-%s-%d.pcap", filedir.c_str(), min(sip, dip).c_str(), max(sip, dip).c_str(), show[name]/300);
+    		pFile=fopen(filename, "a");
     		fwrite(&hdr.ts.tv_sec,1,4,pFile);
     		fwrite(&hdr.ts.tv_usec,1,4,pFile);
     		fwrite(&hdr.caplen,1,8,pFile);
@@ -93,27 +105,29 @@ int dns_ip(char*dir, std::string result){
     		fclose(pFile);
     	}
     	else{
-    		show[name] = 1;
     		pcap_file_header ph;
-    		ph.magic = 0xa1b2c3d4;
-    		ph.version_major = 0x02;
-    		ph.version_minor = 0x04;
-    		ph.thiszone = 0;
-    		ph.sigfigs = 0;
-    		ph.snaplen = 65535;
-    		ph.linktype = 0x1;
-    		pFile = fopen(name.c_str(), "w");
-    		fwrite(&ph, 1, 24, pFile);
-    		fwrite(&hdr.ts.tv_sec, 1, 4, pFile);
-    		fwrite(&hdr.ts.tv_usec, 1, 4, pFile);
-    		fwrite(&hdr.caplen, 1, 8, pFile);
-    		fwrite(packet, 1, hdr.caplen, pFile);
+    		ph.magic=0xa1b2c3d4;
+    		ph.version_major=0x02;
+    		ph.version_minor=0x04;
+    		ph.thiszone=0;
+    		ph.sigfigs=0;
+    		ph.snaplen=65535;
+    		ph.linktype=0x1;
+    		char filename[100];
+    		sprintf(filename, "%s/%s-%s-%d.pcap", filedir.c_str(), min(sip, dip).c_str(), max(sip, dip).c_str(), show[name]/300);
+    		pFile=fopen(filename, "w");
+    		fwrite(&ph,1,24,pFile);
+    		fwrite(&hdr.ts.tv_sec,1,4,pFile);
+    		fwrite(&hdr.ts.tv_usec,1,4,pFile);
+    		fwrite(&hdr.caplen,1,8,pFile);
+    		fwrite(packet,1,hdr.caplen,pFile);
     		fclose(pFile);
     	}
     }
     pcap_close(descr);
     return 0;
 }
+
 
 int tcp_ip(char*dir, std::string result){
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -215,9 +229,11 @@ int https_noack(char*dir, std::string result){
     	tcpptr = (struct tcphdr *)(packet+sizeof(ether_header)+(ipptr->ihl)*4);
     	uint16_t dport = ntohs(tcpptr->dest);
     	uint16_t sport = ntohs(tcpptr->source);
-    	if( dport != uint16_t(443) && sport != uint16_t(443)) continue;
+    //	if( dport != uint16_t(80) && sport != uint16_t(80)) continue;
+    	if(hdr.caplen-(sizeof(ether_header)+(ipptr->ihl)*4+(tcpptr->th_off)*4)==0) continue;
 
-    	if(ipptr->ttl-(ipptr->ihl)*4-(tcpptr->th_off)*4>0)
+
+    	if(ntohs(ipptr->tot_len)-(ipptr->ihl)*4-(tcpptr->th_off)*4>0)
     		if(packet[sizeof(ether_header)+(ipptr->ihl)*4+(tcpptr->th_off)*4]!='\x17') continue;
 
     	std::string sip=inet_ntoa(srcip);
@@ -329,12 +345,12 @@ int main(int argc, char **argv){
     //cmd_run("python cs_dns_ip_pair.py");
     read_file(dir);
     highlight_output(34, "#######################    Dectecting  Trojan     ########################\n");
-    std::thread th1(cmd_run, "python cs_dns_ip_pair.py");
+    //std::thread th1(cmd_run, "python cs_dns_ip_pair.py");
     std::thread th2(cmd_run, "./https.out");
-    std::thread th3(cmd_run, "./tcp.out 108.0.0.0");
-    th1.join();
+    //std::thread th3(cmd_run, "./tcp.out 108.0.0.0");
+    //th1.join();
     th2.join();
-    th3.join();
+    //th3.join();
     highlight_output(34, "#######################    Finish  Dectecting     ########################\n");
 
 //    dns_ip(dir, result);

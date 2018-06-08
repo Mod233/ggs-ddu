@@ -4,6 +4,7 @@ import datetime
 import os
 fp = open('result.txt', "wb")
 warnsub = 30
+DEBUG = True
 white_list = ["qq.com", "baidu.com", "sina.com", "google.com", "4399.com", "youku.com", "souhu.com", "taobao.com", "sina.com",
               "dgso.com", "163.com", "hao123.com", "tudou.com", "pps.tv", "xunlei.com", "sogou.com", "56.com", "tmall.com", "ku6.com",
               "tmall.com", "ifeng.com", "360.cn", "so.com", "2345.com", "qiyi.com", "alipay.com", "renren.com", "sm.cn", "zol.com",
@@ -84,9 +85,13 @@ def stream2vector(dir):
             transaction_id_list.append(transaction_id)
         try:
             if cor_length != real_length and buf[IP].len > 46:  # in case padding some bytes.
+                if DEBUG:
+                    print "cor_length!=real_length"
                 stream.malformed_num += 1
                 malformed = 1
             elif buf[DNS].qdcount > 2 or buf[DNS].ancount > 50 or buf[DNS].nscount > 20 or buf[DNS].arcount > 20:
+                if DEBUG:
+                    print "wrong count"
                 stream.malformed_num += 1
                 malformed = 1
 #            elif buf[DNS].rcode > 5:
@@ -143,7 +148,10 @@ def stream2vector(dir):
         except Exception, e:
             if print_exception:
                 print e.message
-            stream.packet_list.append((timer, use_port, upload, 1, dir, buf, srcip, dstip, 0, 0, len(transaction_id_list)))
+            mal = 1
+            if len(buf) < 60:
+                mal = 0
+            stream.packet_list.append((timer, use_port, upload, mal, dir, buf, srcip, dstip, 0, 0, len(transaction_id_list)))
             continue
     try:
         stream.time = stream.packet_list[-1][1]-stream.time
@@ -210,6 +218,7 @@ def detect_dns(stream):
             else:
                 downspeed += pkt[2]
             if pkt[3] == 1:
+
                 malformed_num += 1
             if pkt[8] == 1:
                 domain_num += 1

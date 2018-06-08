@@ -2,76 +2,73 @@
  * stream_to_vector.h
  *
  *  Created on: Apr 9, 2018
- *      Author: csober
  */
 
 #ifndef STREAM_TO_VECTOR_H_
 #define STREAM_TO_VECTOR_H_
-#include <cstring>
+#include <sys/types.h>
 #include <string>
+#include <string.h>
 #define PKT_NUM 320
 
-
-class flow_vector{
-public:
+struct dns_vector {
+	int port;
+	int domain_num;
+	int onedot_num;
+	double time;
+	int pkt_num;
+	int txt_num;
+	int mail_num;
 	std::string name;
-	double pkt_time[PKT_NUM];
-	unsigned int pkt_size[PKT_NUM];
-	unsigned short pkt_sign[PKT_NUM];
-	bool pkt_tag[PKT_NUM];
-	flow_vector(){
-		memset(pkt_time,0,sizeof(pkt_time));
-		memset(pkt_sign,0,sizeof(pkt_sign));
-		memset(pkt_tag,0,sizeof(pkt_tag));
-	}
-	void init(){
-		memset(pkt_time,0,sizeof(pkt_time));
-		memset(pkt_sign,0,sizeof(pkt_sign));
-		memset(pkt_tag,0,sizeof(pkt_tag));
-	}
+	long long upload;
+	int upload_num;
+	long long download;
+	int download_num;
+	int malformed_num;
+	int transaction_num;
+	int max_host_name_num;
+
 };
 
-class cluster_vector{
-public:
+struct dnshdr {
+	u_int16_t id;
+	u_int16_t flags;
+	u_int16_t qsnum;
+	u_int16_t anrnum;
+	u_int16_t aurnum;
+	u_int16_t adrnum;
+};
+
+struct tcp_vector {
+	std::string name;
+	double pkt_time[PKT_NUM];
+	unsigned short pkt_size[PKT_NUM];
+	bool pkt_tag[PKT_NUM];
+	int pkt_num;
+};
+
+struct cluster_vector {
 	int pkt_num;
 	double pkt_time[PKT_NUM];
 	unsigned int pkt_size[PKT_NUM];
 	bool pkt_tag[PKT_NUM];
-	cluster_vector(){
-		pkt_num = 0;
-		memset(pkt_time,0,sizeof(pkt_time));
-		memset(pkt_size,0,sizeof(pkt_size));
-		memset(pkt_tag,0,sizeof(pkt_tag));
-	}
-	void init(){
-		pkt_num = 0;
-		memset(pkt_time,0,sizeof(pkt_time));
-		memset(pkt_size,0,sizeof(pkt_size));
-		memset(pkt_tag,0,sizeof(pkt_tag));
-	}
-	bool operator<(cluster_vector const& rhs) {
-		if(pkt_num == rhs.pkt_num)
-			if(!memcpy(pkt_time,rhs.pkt_time,PKT_NUM))
-				return memcpy(pkt_tag,rhs.pkt_tag,PKT_NUM);
-			else return memcpy(pkt_time,rhs.pkt_time,PKT_NUM);
-		else return pkt_num<rhs.pkt_num;
-	}
 };
 
-class tid_vector{
-public:
+struct tid_vector {
 	int tid_size;
 	int tid_item[PKT_NUM][4];
-	tid_vector(){
-		tid_size = 0;
-		memset(tid_item,0,sizeof(tid_item));
-	}
-	void init(){
-		tid_size = 0;
-		memset(tid_item,0,sizeof(tid_item));
-	}
 };
 
-flow_vector stream_to_vector(char*dir);
+struct flow_vector {
+	dns_vector dns;
+	tcp_vector tcp;
+//	u_int32_t ip_big;
+//	u_int32_t ip_small;
+//	int
+};
+
+void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr);
+
+void dns_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr);
 
 #endif /* STREAM_TO_VECTOR_H_ */

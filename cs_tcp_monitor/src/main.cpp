@@ -29,47 +29,72 @@
 #include <direct.h>
 #endif
 
+char dir_https[] =
+		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/https_noack";
+char dir_dns[] =
+		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/dns";
 
-char dir[] = "/mnt/myusbmount/Trojan_Monitor/IP_FLOW2/tcp_noack";
-
-
-int read_file(char* base_dir){
-	DIR* pdir;
-	struct dirent *ent;
-	char childpath[512];
-	pdir = opendir(base_dir);
-	memset(childpath,0,sizeof(childpath));
-	while((ent = readdir(pdir))!=NULL){
-		sprintf(childpath, "%s/%s", base_dir, ent->d_name);
-		if(ent->d_type & DT_DIR){
-			if((strcmp(ent->d_name, ".") == 0) || (strcmp(ent->d_name, "..") == 0)) continue;
-			read_file(childpath);
+void sniff_pcap(char* dir) {
+	char errbuf[PCAP_ERRBUF_SIZE];
+	pcap_t* descr;
+	const u_char *packet;
+	struct pcap_pkthdr hdr; /* pcap.h */
+	struct iphdr *ipptr;
+	struct tcphdr *tcpptr;
+	struct udphdr *udpptr;
+	char tcpbuf[1 << 12];
+	descr = pcap_open_offline(dir, errbuf);
+	if (descr == NULL) {
+		printf("pcap_open_offline(): %s\n", errbuf);
+		printf("%s\n", dir);
+		pcap_close(descr);
+	}
+	struct in_addr srcip, dstip;
+	bool tag;
+	int cnt = 0;
+	while (true) {
+		packet = pcap_next(descr, &hdr);
+		if (packet == NULL) {
+			break;
 		}
-		else{
-#if(SHOW_CHILD_PATH)
-			printf("childpath is %s\n", childpath);
-#endif
-			flow_vector cur = stream_to_vector(childpath);
-			int ret = judge_tcp(cur);
-			if(ret)
-				printf("######################\n%s is dangerous\n######################\n", childpath);
+		ipptr = (struct iphdr*) (packet + sizeof(ether_header));
+		if (ipptr->protocol == 6) {
+			tcpptr = (struct tcphdr *) (packet + sizeof(ether_header)
+					+ (ipptr->ihl) * 4);
+			uint16_t sport = ntohs(tcpptr->source);
+			uint16_t dport = ntohs(tcpptr->dest);
+			int tcplen = ntohs(ipptr->tot_len)
+					- (sizeof(ether_header) - (ipptr->ihl) * 4
+							- (tcpptr->th_off) * 4);
+			if (tcplen < 0)
+				continue;
+			if (dport == uint16_t(443) || sport == uint16_t(443)) {
+				if (packet[sizeof(ether_header) + (ipptr->ihl) * 4
+						+ (tcpptr->th_off) * 4] != '\x17')
+					continue;
+			}
+			cnt++;
+			tcp_stream_to_vector(packet, hdr);
+		} else if (ipptr->protocol == 17) {
+			udpptr = (struct udphdr *) (packet + sizeof(ether_header)
+					+ (ipptr->ihl) * 4);
+			uint16_t sport = ntohs(udpptr->source);
+			uint16_t dport = ntohs(udpptr->dest);
+			int udplen = ntohs(ipptr->tot_len)
+					- (sizeof(ether_header) - (ipptr->ihl) * 4 - 8);
+			if (udplen < 0)
+				continue;
+			cnt++;
+			dns_stream_to_vector(packet, hdr);
 		}
 	}
-	//closedir(pdir);
-	return 0;
+	pcap_close(descr);
+	return;
 }
 
-
-int main(int argc,const char*argv[]) {
-	printf("Begining!\n");
-#if(JUDGE_FILE)
-	read_file(dir);
-#else
-	flow_vector cur =stream_to_vector(dir);
-	int ret = judge_tcp(cur);
-	if(ret)
-		printf("%s is dangerous\n", dir);
-#endif
-	printf("Finish!\n");
+int main(int argc, const char*argv[]) {
+	char dir[] = "/mnt/myusbmount/Trojan_Monitor/tcp_trojan/cmdrat.pcap";
+	sniff_pcap(dir);
+	printf("\n\n");
 	return 0;
 }

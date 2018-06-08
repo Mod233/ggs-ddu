@@ -592,7 +592,7 @@ static int Make_TCP_Judgement(void)
 		//printf("%d,%d\n",o_num,t_num);
 		if (!o_num) //没有外部控制簇，正常流
 			return 902; //"Normal! Automatic stream!"
-		else if (t_num > 0 && (float)(o_num)/(float)(t_num) > 0.60) //外部控制簇数占比过高，是木马
+		else if (t_num > 0 && (float)(o_num)/(float)(t_num) > 0.30) //外部控制簇数占比过高，是木马
 			return 102; //"Trojan detected! Outside control!"
 	}
 
@@ -837,7 +837,7 @@ int packet_capture(char* childp)
 		//流中包个数达到250时，开始检测
 		if (flow_ptr->packet_number == 250)
 		{
-
+			printf("asd\n");
 		  judge_num++; //判断次数加1
 
 		  p_num=0;

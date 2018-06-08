@@ -1,0 +1,14 @@
+/tmp/ccztMMaj.o: In function `dns_stream_to_vector(unsigned char const*)':
+stream_to_vector.cpp:(.text+0x598): relocation truncated to fit: R_X86_64_32S against symbol `vis_domain' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x5fb): relocation truncated to fit: R_X86_64_32S against symbol `vis_domain' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x6c5): relocation truncated to fit: R_X86_64_32S against symbol `vis_domain' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x704): relocation truncated to fit: R_X86_64_32S against symbol `vis_domain' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x729): relocation truncated to fit: R_X86_64_32S against symbol `host_name_num' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x74e): relocation truncated to fit: R_X86_64_32S against symbol `host_name_num' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x81e): relocation truncated to fit: R_X86_64_32S against symbol `host_name_num' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x85d): relocation truncated to fit: R_X86_64_32S against symbol `host_name_num' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x8dd): relocation truncated to fit: R_X86_64_32S against symbol `vis_domain' defined in .bss section in /tmp/ccztMMaj.o
+stream_to_vector.cpp:(.text+0x92b): relocation truncated to fit: R_X86_64_32S against symbol `host_name_num' defined in .bss section in /tmp/ccztMMaj.o
+/tmp/cc3HBVEl.o: In function `__static_initialization_and_destruction_0(int, int)':
+apriori_cut_heartbeat.cpp:(.text+0x1589): additional relocation overflows omitted from the output
+collect2: error: ld returned 1 exit status
