@@ -62,9 +62,11 @@ struct tid_vector {
 struct flow_vector {
 	dns_vector dns;
 	tcp_vector tcp;
+	// new file
 	u_int32_t ip_big;
 	u_int32_t ip_small;
 	int crash_num;
+	// finish
 };
 
 void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr);
