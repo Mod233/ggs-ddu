@@ -29,12 +29,16 @@
 #include <direct.h>
 #endif
 
+unsigned int subnet_intranet; //存储子网ip，用于区分内部IP地址和外部IP地址
+unsigned int subnet_extranet; //存储子网ip，用于区分内部IP地址和外部IP地址
+unsigned int subnet_mask;  //设定子网掩码，用于区获取子网号
+
 char dir_https[] =
 		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/https_noack";
 char dir_dns[] =
 		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/dns";
 
-void sniff_pcap(char* dir) {
+void sniff_pcap(const char* dir) {
 	char errbuf[PCAP_ERRBUF_SIZE];
 	pcap_t* descr;
 	const u_char *packet;
@@ -93,8 +97,11 @@ void sniff_pcap(char* dir) {
 }
 
 int main(int argc, const char*argv[]) {
-	char dir[] = "/mnt/myusbmount/Trojan_Monitor/tcp_trojan/cmdrat.pcap";
-	sniff_pcap(dir);
+	//char dir[] = "/mnt/myusbmount/Trojan_Monitor/tcp_trojan/cmdrat.pcap";
+	subnet_intranet = ntohl(inet_addr(argv[2]));
+	printf("%s\n", argv[1]);
+	subnet_mask = ntohl(inet_addr("255.0.0.0"));
+	sniff_pcap(argv[1]);
 	printf("\n\n");
 	return 0;
 }

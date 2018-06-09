@@ -26,11 +26,12 @@
 #define HOLE_SIZE 600
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)>(b)?(b):(a))
-unsigned int subnet_intranet = ntohl(inet_addr("10.0.0.0")); //存储子网ip，用于区分内部IP地址和外部IP地址
-unsigned int subnet_extranet = ntohl(inet_addr("108.0.0.0")); //存储子网ip，用于区分内部IP地址和外部IP地址
-unsigned int subnet_mask = ntohl(inet_addr("255.0.0.0"));  //设定子网掩码，用于区获取子网号
+//unsigned int subnet_intranet = ntohl(inet_addr("10.0.0.0")); //存储子网ip，用于区分内部IP地址和外部IP地址
+//unsigned int subnet_extranet = ntohl(inet_addr("108.0.0.0")); //存储子网ip，用于区分内部IP地址和外部IP地址
+//unsigned int subnet_mask = ntohl(inet_addr("255.0.0.0"));  //设定子网掩码，用于区获取子网号
 
 flow_vector all_flow[IP_SIZE]; //when to init??
+bool warn[IP_SIZE];
 bool vis_domain[IP_SIZE][HOLE_SIZE]; //ip_num-topdomain-hostname
 bool white_list[HOLE_SIZE];
 int host_name_num[IP_SIZE][HOLE_SIZE];
@@ -59,13 +60,16 @@ void dns_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 	if (dnslen < 1)
 		return;
 	int ip_num = ip_mkhash(ipptr->saddr, ipptr->daddr);
+	if (warn[ip_num])
+		return;
 	// new add
+#if(0)
 	if (all_flow[ip_num].tcp.pkt_num + all_flow[ip_num].dns.pkt_num) {
 		if (MAX(ipptr->saddr, ipptr->daddr) != all_flow[ip_num].ip_big
 				&& MIN(ipptr->saddr, ipptr->daddr)
-						!= all_flow[ip_num].ip_small) {
+				!= all_flow[ip_num].ip_small) {
 			if (all_flow[ip_num].crash_num > 90)
-				memset(&all_flow[ip_num], 0, sizeof(flow_vector));
+			memset(&all_flow[ip_num], 0, sizeof(flow_vector));
 			else {
 				all_flow[ip_num].crash_num++;
 				return;
@@ -73,8 +77,12 @@ void dns_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 		} else {
 			all_flow[ip_num].crash_num = 0;
 		}
+	} else {
+		all_flow[ip_num].ip_big = MAX(ipptr->saddr, ipptr->daddr);
+		all_flow[ip_num].ip_small = MIN(ipptr->saddr, ipptr->daddr);
 	}
 	// finish
+#endif
 	if (dport == uint16_t(53)) {
 		all_flow[ip_num].dns.upload_num++;
 		all_flow[ip_num].dns.upload += dnslen;
@@ -92,11 +100,9 @@ void dns_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 			|| (ntohs(dnsptr->aurnum) > u_int16_t(100))
 			|| (ntohs(dnsptr->adrnum) > u_int16_t(100))) {
 		all_flow[ip_num].dns.malformed_num++;
-		return;
 	}
 	if (dnslen != ntohs(udpptr->len) - 8) {
 		all_flow[ip_num].dns.malformed_num++;
-		return;
 	}
 	memset(hostname, 0, sizeof(hostname));
 	memset(topdomain, 0, sizeof(topdomain));
@@ -189,6 +195,7 @@ void dns_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 #endif
 		int res = judge_dns(all_flow[ip_num].dns);
 		if (res) {
+			warn[ip_num] = 1;
 			printf("\033[1;31mdns-%s-", inet_ntoa(dstip));
 			printf("%s is dangerous\033[1;0m\n", inet_ntoa(srcip));
 		}
@@ -241,6 +248,8 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 #endif
 	int ip_num = ip_mkhash(tag ? ipptr->saddr : ipptr->daddr,
 			tag ? ipptr->daddr : ipptr->saddr);
+	if (warn[ip_num])
+		return;
 	// new add
 	if (all_flow[ip_num].tcp.pkt_num + all_flow[ip_num].dns.pkt_num) {
 		if (MAX(ipptr->saddr, ipptr->daddr) != all_flow[ip_num].ip_big
@@ -255,6 +264,9 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 		} else {
 			all_flow[ip_num].crash_num = 0;
 		}
+	} else {
+		all_flow[ip_num].ip_big = MAX(ipptr->saddr, ipptr->daddr);
+		all_flow[ip_num].ip_small = MIN(ipptr->saddr, ipptr->daddr);
 	}
 	// finish
 	int cnt = all_flow[ip_num].tcp.pkt_num;
@@ -266,6 +278,7 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 	if (all_flow[ip_num].tcp.pkt_num > 299) {
 		int res = judge_tcp(all_flow[ip_num].tcp);
 		if (res == 1) {
+			warn[ip_num] = 1;
 //			std::string sip = inet_ntoa(srcip);
 //			std::string dip = inet_ntoa(dstip);
 //			std::cout << "here sip and dip is " << sip << "  " << dip
