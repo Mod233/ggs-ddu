@@ -98,6 +98,7 @@ void sniff_pcap(const char* dir) {
 
 int main(int argc, const char*argv[]) {
 	//char dir[] = "/mnt/myusbmount/Trojan_Monitor/tcp_trojan/cmdrat.pcap";
+	printf("Usage: ./https file ip");
 	subnet_intranet = ntohl(inet_addr(argv[2]));
 	printf("%s\n", argv[1]);
 	subnet_mask = ntohl(inet_addr("255.0.0.0"));
