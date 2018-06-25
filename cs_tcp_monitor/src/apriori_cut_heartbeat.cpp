@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include "debug.h"
 #include "init.h"
-int heart_num[256];
-int q[256];
+int heart_num[526];
+int q[526];
 int find_heartbeat(int slice_num, cluster_vector* clu, double confi,
 		int* heart) {
 	int heart_num = 0;
@@ -23,6 +23,9 @@ int find_heartbeat(int slice_num, cluster_vector* clu, double confi,
 			max_pos = i;
 		}
 	}
+//	printf("max_pos is %d\n", max_pos);
+	if(max_pos<0) return 0;
+	if(q[max_pos]<(1<<8)) return 0;
 	heart_num = clu[max_pos].pkt_num;
 	for (int i = 0; i < heart_num; i++)
 		heart[i] = clu[max_pos].pkt_size[i];

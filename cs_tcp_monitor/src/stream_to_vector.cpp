@@ -236,14 +236,13 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 #elif(KNOW_EXTRANET)
 	if( (ntohl(ipptr->saddr) & subnet_mask) == subnet_extranet &&
 			(ntohl(ipptr->daddr) & subnet_mask) == subnet_extranet)
-	continue;
+	return;
 	else if((ntohl(ipptr->saddr) & subnet_mask) != subnet_extranet &&
 			(ntohl(ipptr->daddr) & subnet_mask) != subnet_extranet)
-	continue;
+	return;
 	else if((ntohl(ipptr->saddr) & subnet_mask) != subnet_extranet) tag = 1;
 	else {
 		tag = 0;
-		swap(sip, dip);
 	}
 #endif
 	int ip_num = ip_mkhash(tag ? ipptr->saddr : ipptr->daddr,
@@ -270,13 +269,18 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 	}
 	// finish
 	int cnt = all_flow[ip_num].tcp.pkt_num;
-	all_flow[ip_num].tcp.pkt_size[cnt] = hdr.caplen;
+	all_flow[ip_num].tcp.pkt_size[cnt] = ntohs(ipptr->tot_len)
+			- (ipptr->ihl) * 4 - (tcpptr->th_off) * 4;
+	//hdr.caplen;
+
 	all_flow[ip_num].tcp.pkt_tag[cnt] = tag;
 	all_flow[ip_num].tcp.pkt_time[cnt] = double(hdr.ts.tv_sec)
 			+ double(hdr.ts.tv_usec / 1000000.0);
 	all_flow[ip_num].tcp.pkt_num++;
 	if (all_flow[ip_num].tcp.pkt_num > 299) {
+//		printf("go judge\n");
 		int res = judge_tcp(all_flow[ip_num].tcp);
+//		printf("end judge\n");
 		if (res == 1) {
 			warn[ip_num] = 1;
 //			std::string sip = inet_ntoa(srcip);
