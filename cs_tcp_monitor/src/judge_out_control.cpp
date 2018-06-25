@@ -71,6 +71,7 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 		arrival_time_max = std::max(arrival_time_max, delta_arrival_time);
 	}
 	slice_num = time_slice(stream_vector, arrival_time_max / 2.0, clu);
+//	printf("after slice\n");
 	double delta_time_first = 0.0;
 	delta_time_first = clu[1].pkt_time[0] - clu[0].pkt_time[0];
 #if(SHOW_SLICE_RESULT)
@@ -99,7 +100,9 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 #if(CUT_HEARTBEAT)
 	int heart[10];
 	memset(heart, 0, sizeof(heart));
+//	printf("go find_heartbeat\n");
 	heart_num = find_heartbeat(slice_num, clu, CONFIGDENT, heart);
+//	printf("after find_heartbeat\n");
 	bool vis[10];
 	for (int i = 0; i < slice_num; i++) {
 		memset(vis, 0, sizeof(vis));
@@ -179,7 +182,7 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 	//beijing add
 	if (slice_num < 5)
 		return 0;
-	if (outctl_num > (slice_num - single_pkt_num) / 4)
+	if (outctl_num > (slice_num - single_pkt_num) / 3)
 		return 1;
 	else
 		return 0;
