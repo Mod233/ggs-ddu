@@ -87,9 +87,9 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 		printf("\n");
 	}
 #endif
-	if (slice_num < 3) {
+	if (slice_num < 8) {  // important!
 #if(SHOW_SLICE_RESULT)
-		printf("not enough slice_num\n");
+			printf("not enough slice_num\n");
 #endif
 		return 0;
 	}
@@ -152,10 +152,27 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 			single_pkt_num++;
 			continue;
 		}
+#if(UP_DOWN)
+		//add up_data:down_data
+		int up_data = 0;
+		int down_data = 0;
+		for (int j = 0, cnt = 0; j < clu[i].pkt_num; j++) {
+			if (clu[i].pkt_size[j])
+				cnt++;
+			if (clu[i].pkt_tag[j])
+				up_data += clu[i].pkt_size[j];
+			else
+				down_data += clu[i].pkt_size[j];
+		}
+		if (up_data > down_data)
+			continue;
+#endif
 		int pos = 0, pos2, pos3;
 		while (clu[i].pkt_size[pos] < 1)
 			pos++;
 		if (clu[i].pkt_tag[pos])
+			continue;
+		if (clu[i].pkt_size[pos] > 200)
 			continue;
 		pos2 = pos + 1;
 		while (clu[i].pkt_size[pos2] < 1)
@@ -182,7 +199,7 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 	//beijing add
 	if (slice_num < 5)
 		return 0;
-	if (outctl_num > (slice_num - single_pkt_num) / 3)
+	if (outctl_num > (slice_num - single_pkt_num) / 2)
 		return 1;
 	else
 		return 0;
