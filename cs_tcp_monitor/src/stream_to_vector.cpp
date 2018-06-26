@@ -221,6 +221,7 @@ void tcp_stream_to_vector(const u_char*packet, struct pcap_pkthdr hdr) {
 	srcip.s_addr = in_addr_t(ipptr->saddr);
 	dstip.s_addr = in_addr_t(ipptr->daddr);
 	tag = 0;
+	// 1: in->out 0:out->in
 #if(KNOW_INTRANET)
 	if ((ntohl(ipptr->saddr) & subnet_mask) == subnet_intranet
 			&& (ntohl(ipptr->daddr) & subnet_mask) == subnet_intranet)
