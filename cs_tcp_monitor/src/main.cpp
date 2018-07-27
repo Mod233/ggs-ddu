@@ -33,11 +33,11 @@
 unsigned int subnet_intranet; //存储子网ip，用于区分内部IP地址和外部IP地址
 unsigned int subnet_extranet; //存储子网ip，用于区分内部IP地址和外部IP地址
 unsigned int subnet_mask;  //设定子网掩码，用于区获取子网号
-
-char dir_https[] =
-		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/https_noack";
-char dir_dns[] =
-		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/dns";
+//
+//char dir_https[] =
+//		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/https_noack";
+//char dir_dns[] =
+//		"/home/csober/Documents/Github/ggs-ddu/Trojan-beta/SplitedFlow/dns";
 
 void sniff_pcap(const char* dir) {
 	char errbuf[PCAP_ERRBUF_SIZE];

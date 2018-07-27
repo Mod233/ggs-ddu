@@ -87,7 +87,7 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 		printf("\n");
 	}
 #endif
-	if (slice_num < 8) {  // important!
+	if (slice_num < 3) {  // important!
 #if(SHOW_SLICE_RESULT)
 			printf("not enough slice_num\n");
 #endif
@@ -156,7 +156,7 @@ int judge_out_control(tcp_vector stream_vector, cluster_vector* clu) {
 		//add up_data:down_data
 		int up_data = 0;
 		int down_data = 0;
-		for (int j = 0, cnt = 0; j < clu[i].pkt_num; j++) {
+		for (int j = 0, cnt = 0; cnt < clu[i].pkt_num; j++) {
 			if (clu[i].pkt_size[j])
 				cnt++;
 			if (clu[i].pkt_tag[j])
